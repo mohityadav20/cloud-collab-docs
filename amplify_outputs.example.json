@@ -1,0 +1,46 @@
+{
+  "version": "1",
+  "auth": {
+    "userPoolId": "us-east-1_xxxxxxxxx",
+    "userPoolClientId": "xxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "identityPoolId": "us-east-1:xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+    "mfaConfiguration": "OFF",
+    "mfaMethods": [],
+    "passwordPolicy": {
+      "minLength": 8,
+      "requireNumbers": true,
+      "requireSpecialCharacters": true,
+      "requireUppercase": true,
+      "requireLowercase": true
+    },
+    "standardAttributes": {
+      "email": {
+        "required": true,
+        "mutable": true
+      }
+    },
+    "usernameAttributes": ["email"],
+    "unauthenticatedIdentitiesEnabled": false
+  },
+  "data": {
+    "aws_appsync_graphqlEndpoint": "https://xxxxxxxxxxxx.appsync-api.us-east-1.amazonaws.com/graphql",
+    "aws_appsync_region": "us-east-1",
+    "aws_appsync_authenticationType": "AMAZON_COGNITO_USER_POOLS",
+    "aws_appsync_apiKey": null,
+    "defaultAuthorizationType": {
+      "mode": "AMAZON_COGNITO_USER_POOLS",
+      "cognitoUserPoolId": "us-east-1_xxxxxxxxx"
+    },
+    "conflictResolutionMode": "AUTOMERGE",
+    "modelIntrospection": null
+  },
+  "storage": {
+    "aws_user_files_s3_bucket": "collab-docs-assets-dev-xxxxxxxxxx",
+    "aws_user_files_s3_bucket_region": "us-east-1",
+    "aws_user_files_s3_dangerously_connect_to_http_endpoint_for_testing": false
+  },
+  "custom": {
+    "imageResizeFunctionArn": "arn:aws:lambda:us-east-1:xxxxxxxxxxxx:function:imageResize-dev"
+  }
+}
+

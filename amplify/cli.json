@@ -1,0 +1,11 @@
+{
+  "features": {
+    "graphqltransformer": {
+      "transformerversion": 2
+    },
+    "project": {
+      "overrides": true
+    }
+  }
+}
+
