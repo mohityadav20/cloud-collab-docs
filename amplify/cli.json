@@ -1,11 +1,15 @@
 {
   "features": {
     "graphqltransformer": {
-      "transformerversion": 2
+      "transformerversion": 2,
+      "securityEnhancementNotification": false,
+      "showFieldAuthNotification": false
     },
     "project": {
       "overrides": true
     }
+  },
+  "debug": {
+    "shareProjectConfig": false
   }
 }
-

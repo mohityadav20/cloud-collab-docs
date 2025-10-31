@@ -1,0 +1,11 @@
+{
+  "AppSyncApiName": "cc2",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthCognitoUserPoolId": {
+    "Fn::GetAtt": [
+      "authcc2e4cbecce",
+      "Outputs.UserPoolId"
+    ]
+  }
+}
