@@ -22,7 +22,7 @@ const CreateDocumentButton: React.FC<CreateDocumentButtonProps> = ({ onCreate })
     try {
       setLoading(true);
       const response = await client.graphql({
-        query: createDocument,
+        query: createDocument as any,
         variables: {
           input: {
             title: 'Untitled Document',
@@ -30,9 +30,9 @@ const CreateDocumentButton: React.FC<CreateDocumentButtonProps> = ({ onCreate })
             ownerEmail: '', // Will be set by resolver from Cognito
           },
         },
-      });
+      }) as any;
 
-      if (response.data?.createDocument?.id) {
+      if ('data' in response && response.data?.createDocument?.id) {
         onCreate(response.data.createDocument.id);
       }
     } catch (error) {

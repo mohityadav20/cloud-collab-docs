@@ -26,11 +26,11 @@ const ExportButton: React.FC<ExportButtonProps> = ({ documentId }) => {
       
       // Load document
       const response = await client.graphql({
-        query: getDocument,
+        query: getDocument as any,
         variables: { id: documentId },
-      });
+      }) as any;
 
-      if (!response.data?.getDocument) {
+      if (!('data' in response) || !response.data?.getDocument) {
         throw new Error('Document not found');
       }
 

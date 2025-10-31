@@ -40,11 +40,11 @@ const DocumentEditor: React.FC = () => {
     try {
       setLoading(true);
       const response = await client.graphql({
-        query: getDocument,
+        query: getDocument as any,
         variables: { id: documentId },
-      });
+      }) as any;
 
-      if (response.data?.getDocument) {
+      if ('data' in response && response.data?.getDocument) {
         const doc = response.data.getDocument;
         setDocumentData(doc);
         setTitle(doc.title);
@@ -70,7 +70,7 @@ const DocumentEditor: React.FC = () => {
       try {
         setIsSaving(true);
         await client.graphql({
-          query: updateDocument, // This is actually a mutation, but Amplify GraphQL uses 'query' field
+          query: updateDocument as any, // This is actually a mutation, but Amplify GraphQL uses 'query' field
           variables: {
             input: {
               id: documentId,
@@ -78,7 +78,7 @@ const DocumentEditor: React.FC = () => {
               title: newTitle,
             },
           },
-        });
+        }) as any;
       } catch (error) {
         console.error('Failed to save document:', error);
       } finally {

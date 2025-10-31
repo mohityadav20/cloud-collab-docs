@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import { generateClient } from 'aws-amplify/api';
 import ShareButton from './ShareButton';
 import ExportButton from './ExportButton';
-
-const client = generateClient();
 
 interface DocumentToolbarProps {
   title: string;

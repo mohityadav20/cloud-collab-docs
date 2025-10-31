@@ -31,11 +31,11 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ documentId, onClose }) => {
   const loadShares = async () => {
     try {
       const response = await client.graphql({
-        query: listShares,
+        query: listShares as any,
         variables: { documentId },
-      });
+      }) as any;
 
-      if (response.data?.listShares?.items) {
+      if ('data' in response && response.data?.listShares?.items) {
         setShares(response.data.listShares.items);
       }
     } catch (error) {
@@ -52,7 +52,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ documentId, onClose }) => {
     try {
       setLoading(true);
       await client.graphql({
-        query: createShare,
+        query: createShare as any,
         variables: {
           input: {
             documentId,
@@ -61,7 +61,7 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ documentId, onClose }) => {
             permission,
           },
         },
-      });
+      }) as any;
 
       setEmail('');
       loadShares();
@@ -79,14 +79,14 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ documentId, onClose }) => {
   const handleUpdatePermission = async (shareId: string, newPermission: 'READ' | 'WRITE') => {
     try {
       await client.graphql({
-        query: updateShare,
+        query: updateShare as any,
         variables: {
           input: {
             id: shareId,
             permission: newPermission,
           },
         },
-      });
+      }) as any;
 
       loadShares();
     } catch (error) {
@@ -100,9 +100,9 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ documentId, onClose }) => {
   const handleRemoveShare = async (shareId: string) => {
     try {
       await client.graphql({
-        query: deleteShare,
+        query: deleteShare as any,
         variables: { input: { id: shareId } },
-      });
+      }) as any;
 
       loadShares();
     } catch (error) {

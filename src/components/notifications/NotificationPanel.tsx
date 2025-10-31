@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { useDocumentSubscription } from '../../hooks/useDocumentSubscription';
+import React, { useState } from 'react';
 
 interface Notification {
   id: string;
@@ -15,24 +14,19 @@ interface Notification {
 const NotificationPanel: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  /**
-   * Add notification
-   */
-  const addNotification = (message: string, type: Notification['type'] = 'info') => {
-    const notification: Notification = {
-      id: Date.now().toString(),
-      message,
-      timestamp: new Date(),
-      type,
-    };
-
-    setNotifications((prev) => [notification, ...prev].slice(0, 5));
-
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-      setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
-    }, 5000);
-  };
+  // Add notification function (can be called from elsewhere)
+  // const addNotification = (message: string, type: Notification['type'] = 'info') => {
+  //   const notification: Notification = {
+  //     id: Date.now().toString(),
+  //     message,
+  //     timestamp: new Date(),
+  //     type,
+  //   };
+  //   setNotifications((prev) => [notification, ...prev].slice(0, 5));
+  //   setTimeout(() => {
+  //     setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
+  //   }, 5000);
+  // };
 
   /**
    * Remove notification

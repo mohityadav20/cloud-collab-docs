@@ -26,10 +26,12 @@ export const useDocumentSubscription = (documentId: string) => {
     }
 
     // Create new subscription
-    subscriptionRef.current = client.graphql({
-      query: onUpdateDocument,
+    const subscription = client.graphql({
+      query: onUpdateDocument as any,
       variables: { documentId },
-    }).subscribe({
+    }) as any;
+    
+    subscriptionRef.current = subscription.subscribe({
       next: ({ data }: any) => {
         if (data?.onUpdateDocument) {
           callback(data.onUpdateDocument);

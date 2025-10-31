@@ -44,11 +44,11 @@ const DocumentList: React.FC = () => {
     try {
       setLoading(true);
       const response = await client.graphql({
-        query: listDocuments,
+        query: listDocuments as any,
         variables: {},
-      });
+      }) as any;
 
-      if (response.data?.listDocuments?.items) {
+      if ('data' in response && response.data?.listDocuments?.items) {
         setDocuments(response.data.listDocuments.items);
       }
     } catch (error) {

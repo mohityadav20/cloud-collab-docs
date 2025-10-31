@@ -40,7 +40,7 @@ export const configure = () => {
       GraphQL: {
         endpoint: apiEndpoint,
         region,
-        defaultAuthMode: 'userPool',
+        defaultAuthMode: 'userPool' as const,
       },
     },
     Storage: {
