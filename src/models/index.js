@@ -7,12 +7,13 @@ const Permission = {
   "WRITE": "WRITE"
 };
 
-const { Document, Share, UserProfile, DocumentPresence } = initSchema(schema);
+const { Document, Share, UserProfile, DocumentPresence, Template } = initSchema(schema);
 
 export {
   Document,
   Share,
   UserProfile,
   DocumentPresence,
+  Template,
   Permission
 };

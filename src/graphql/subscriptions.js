@@ -7,6 +7,9 @@ export const onCreateDocument = /* GraphQL */ `
       id
       title
       content
+      description
+      tags
+      isFavorite
       createdAt
       updatedAt
       owner
@@ -24,6 +27,9 @@ export const onUpdateDocument = /* GraphQL */ `
       id
       title
       content
+      description
+      tags
+      isFavorite
       createdAt
       updatedAt
       owner
@@ -41,6 +47,9 @@ export const onDeleteDocument = /* GraphQL */ `
       id
       title
       content
+      description
+      tags
+      isFavorite
       createdAt
       updatedAt
       owner
@@ -110,8 +119,8 @@ export const onDeleteShare = /* GraphQL */ `
   }
 `;
 export const onCreateUserProfile = /* GraphQL */ `
-  subscription OnCreateUserProfile {
-    onCreateUserProfile {
+  subscription OnCreateUserProfile($owner: String!) {
+    onCreateUserProfile(owner: $owner) {
       id
       email
       username
@@ -121,13 +130,14 @@ export const onCreateUserProfile = /* GraphQL */ `
       _deleted
       _lastChangedAt
       updatedAt
+      owner
       __typename
     }
   }
 `;
 export const onUpdateUserProfile = /* GraphQL */ `
-  subscription OnUpdateUserProfile {
-    onUpdateUserProfile {
+  subscription OnUpdateUserProfile($owner: String!) {
+    onUpdateUserProfile(owner: $owner) {
       id
       email
       username
@@ -137,13 +147,14 @@ export const onUpdateUserProfile = /* GraphQL */ `
       _deleted
       _lastChangedAt
       updatedAt
+      owner
       __typename
     }
   }
 `;
 export const onDeleteUserProfile = /* GraphQL */ `
-  subscription OnDeleteUserProfile {
-    onDeleteUserProfile {
+  subscription OnDeleteUserProfile($owner: String!) {
+    onDeleteUserProfile(owner: $owner) {
       id
       email
       username
@@ -153,6 +164,7 @@ export const onDeleteUserProfile = /* GraphQL */ `
       _deleted
       _lastChangedAt
       updatedAt
+      owner
       __typename
     }
   }
@@ -204,6 +216,63 @@ export const onDeleteDocumentPresence = /* GraphQL */ `
       _lastChangedAt
       createdAt
       updatedAt
+      __typename
+    }
+  }
+`;
+export const onCreateTemplate = /* GraphQL */ `
+  subscription OnCreateTemplate {
+    onCreateTemplate {
+      id
+      name
+      description
+      content
+      category
+      isPublic
+      owner
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+  }
+`;
+export const onUpdateTemplate = /* GraphQL */ `
+  subscription OnUpdateTemplate {
+    onUpdateTemplate {
+      id
+      name
+      description
+      content
+      category
+      isPublic
+      owner
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+  }
+`;
+export const onDeleteTemplate = /* GraphQL */ `
+  subscription OnDeleteTemplate {
+    onDeleteTemplate {
+      id
+      name
+      description
+      content
+      category
+      isPublic
+      owner
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
       __typename
     }
   }

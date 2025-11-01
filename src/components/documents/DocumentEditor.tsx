@@ -1,158 +1,226 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { generateClient } from 'aws-amplify/api';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import { getDocument } from '../../graphql/queries';
-import { updateDocument } from '../../graphql/mutations';
+import { updateDocument, deleteDocument } from '../../graphql/mutations';
 import { Document } from '../../types';
 import DocumentToolbar from './DocumentToolbar';
-import ShareDialog from './ShareDialog';
 import NotificationPanel from '../notifications/NotificationPanel';
-import { useDocumentSubscription } from '../../hooks/useDocumentSubscription';
-import { debounce } from '../../utils/debounce';
 
 const client = generateClient();
 
 /**
  * Document editor component
- * Main editor with ReactQuill and real-time sync via GraphQL subscriptions
+ * Main editor with ReactQuill - manual save only
  */
 const DocumentEditor: React.FC = () => {
   const { documentId } = useParams<{ documentId: string }>();
   const navigate = useNavigate();
   const [documentData, setDocumentData] = useState<Document | null>(null);
-  const [content, setContent] = useState('');
-  const [title, setTitle] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [content, setContent] = useState(' ');
+  const [title, setTitle] = useState('Untitled Document');
+  const [description, setDescription] = useState('');
+  const [tags, setTags] = useState('');
+  const [loading, setLoading] = useState(false); // Start with false to avoid flicker
   const [isSaving, setIsSaving] = useState(false);
   const quillRef = useRef<ReactQuill>(null);
 
-  // Real-time subscription hook
-  const { subscribeToUpdates } = useDocumentSubscription(documentId || '');
 
   /**
-   * Load document from GraphQL API
+   * Manual save function
+   * Saves document to GraphQL API
    */
-  const loadDocument = useCallback(async () => {
-    if (!documentId) return;
+  const handleSave = async () => {
+    if (!documentId || !documentData) return;
 
     try {
-      setLoading(true);
+      setIsSaving(true);
+      
+      // Parse tags from comma-separated string
+      const tagsList = tags.split(',').map(t => t.trim()).filter(Boolean);
+      
+      // Include _version for conflict resolution (required by AppSync)
       const response = await client.graphql({
-        query: getDocument as any,
-        variables: { id: documentId },
+        query: updateDocument as any,
+        variables: {
+          input: {
+            id: documentId,
+            content: content,
+            title: title,
+            description: description,
+            tags: tagsList.length > 0 ? tagsList : null,
+            _version: documentData._version || 1, // Include version for conflict resolution
+          },
+        },
+        authMode: 'userPool',
       }) as any;
-
-      if ('data' in response && response.data?.getDocument) {
-        const doc = response.data.getDocument;
-        setDocumentData(doc);
-        setTitle(doc.title);
-        setContent(doc.content || '');
+      
+      // Update document data with response from server (includes new _version)
+      if ('data' in response && response.data?.updateDocument) {
+        const updatedDoc = response.data.updateDocument;
+        setDocumentData(updatedDoc);
+        console.log('Document saved:', updatedDoc);
       }
-    } catch (error) {
-      console.error('Failed to load document:', error);
-      alert('Failed to load document. Redirecting...');
-      navigate('/documents');
+      
+      alert('Document saved successfully!');
+    } catch (error: any) {
+      console.error('Failed to save document:', error);
+      const errorMessage = error?.errors?.[0]?.message || error?.message || 'Failed to save document. Please try again.';
+      alert(`Failed to save: ${errorMessage}`);
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
-  }, [documentId, navigate]);
+  };
 
   /**
-   * Save document to GraphQL API
-   * Uses debouncing to avoid excessive API calls
+   * Delete document function
+   * Soft deletes document using deleteDocument mutation
    */
-  const saveDocument = useCallback(
-    debounce(async (newContent: string, newTitle: string) => {
-      if (!documentId) return;
+  const handleDelete = async () => {
+    if (!documentId) return;
 
-      try {
-        setIsSaving(true);
-        await client.graphql({
-          query: updateDocument as any, // This is actually a mutation, but Amplify GraphQL uses 'query' field
-          variables: {
-            input: {
-              id: documentId,
-              content: newContent,
-              title: newTitle,
-            },
-          },
-        }) as any;
-      } catch (error) {
-        console.error('Failed to save document:', error);
-      } finally {
-        setIsSaving(false);
+    // Confirm deletion
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${title}"?\n\nThis can be restored from the Trash.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setIsSaving(true); // Reuse loading state for delete operation
+      
+      // Fetch the latest version first to ensure we have the current _version
+      const fetchResponse = await client.graphql({
+        query: getDocument as any,
+        variables: { id: documentId },
+        authMode: 'userPool',
+      }) as any;
+
+      if (!('data' in fetchResponse) || !fetchResponse.data?.getDocument) {
+        throw new Error('Document not found');
       }
-    }, 1000),
-    [documentId]
-  );
+
+      const currentDoc = fetchResponse.data.getDocument;
+      
+      // Check if already deleted
+      if (currentDoc._deleted) {
+        alert('This document has already been deleted.');
+        navigate('/documents');
+        return;
+      }
+
+      console.log('Deleting document with version:', currentDoc._version);
+      
+      // Use deleteDocument mutation (soft delete)
+      const deleteResponse = await client.graphql({
+        query: deleteDocument as any,
+        variables: {
+          input: {
+            id: documentId,
+            _version: currentDoc._version,
+          },
+        },
+        authMode: 'userPool',
+      }) as any;
+      
+      console.log('Delete response:', deleteResponse);
+      
+      // Navigate back to documents list after successful deletion
+      alert('Document moved to trash successfully!');
+      navigate('/documents');
+    } catch (error: any) {
+      console.error('Failed to delete document:', error);
+      console.error('Full error:', JSON.stringify(error, null, 2));
+      const errorMessage = error?.errors?.[0]?.message || error?.message || 'Failed to delete document. Please try again.';
+      alert(`Failed to delete document: ${errorMessage}`);
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   /**
    * Handle content change
+   * No auto-save - just update local state
    */
   const handleContentChange = (newContent: string) => {
     setContent(newContent);
-    if (title && documentId) {
-      saveDocument(newContent, title);
-    }
   };
 
   /**
    * Handle title change
+   * No auto-save - just update local state
    */
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
-    if (documentId) {
-      saveDocument(content, newTitle);
-    }
   };
 
   /**
-   * Setup real-time subscription
+   * Load document once on mount
    */
   useEffect(() => {
     if (!documentId) return;
 
-    loadDocument();
+    let retryCount = 0;
+    const maxRetries = 3;
 
-    // Subscribe to document updates
-    const unsubscribe = subscribeToUpdates((updatedDoc: Document) => {
-      // Only update if content changed externally
-      if (updatedDoc.id === documentId) {
-        // Don't overwrite local changes if user is typing
-        // This is a simple implementation; production should use operational transforms
-        if (documentData && updatedDoc.updatedAt !== documentData.updatedAt) {
-          const isLocalChange = quillRef.current?.getEditor().hasFocus();
-          if (!isLocalChange) {
-            setContent(updatedDoc.content || '');
-            setDocumentData(updatedDoc);
-          }
-        } else if (!documentData) {
-          // First load
-          setDocumentData(updatedDoc);
-          setContent(updatedDoc.content || '');
+    const loadWithRetry = async () => {
+      try {
+        setLoading(true);
+        const response = await client.graphql({
+          query: getDocument as any,
+          variables: { id: documentId },
+          authMode: 'userPool',
+        }) as any;
+
+        if ('data' in response && response.data?.getDocument) {
+          const doc = response.data.getDocument;
+          setDocumentData(doc);
+          setTitle(doc.title);
+          setContent(doc.content || ' ');
+          setDescription(doc.description || '');
+          setTags(doc.tags?.join(', ') || '');
+          setLoading(false);
+          // Store version for conflict resolution (needed for delete)
+        } else if (retryCount < maxRetries) {
+          // Document might not be immediately available (eventual consistency)
+          retryCount++;
+          setTimeout(() => {
+            loadWithRetry();
+          }, 300 * retryCount); // Exponential backoff
+        } else {
+          // After max retries, show error
+          setLoading(false);
+          alert('Document not found. Redirecting...');
+          navigate('/documents');
+        }
+      } catch (error) {
+        console.error('Failed to load document:', error);
+        if (retryCount < maxRetries) {
+          retryCount++;
+          setTimeout(() => {
+            loadWithRetry();
+          }, 300 * retryCount);
+        } else {
+          setLoading(false);
+          alert('Failed to load document. Redirecting...');
+          navigate('/documents');
         }
       }
-    });
-
-    return () => {
-      unsubscribe();
     };
-  }, [documentId, loadDocument, subscribeToUpdates]);
 
-  if (loading) {
+    loadWithRetry();
+    
+    // No subscription - only load once on mount
+    // User will save manually when ready
+  }, [documentId, navigate]);
+
+  // Show loading spinner only if we're actively loading and have no data
+  if (loading && !documentData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-      </div>
-    );
-  }
-
-  if (!documentData) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-500">Document not found</p>
       </div>
     );
   }
@@ -163,11 +231,59 @@ const DocumentEditor: React.FC = () => {
         title={title}
         onTitleChange={handleTitleChange}
         onBack={() => navigate('/documents')}
+        onSave={handleSave}
+        onDelete={handleDelete}
         isSaving={isSaving}
         documentId={documentId || ''}
       />
 
+
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Description and Tags */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-4">
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Description
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Add a brief description..."
+              rows={2}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Tags (comma separated)
+            </label>
+            <input
+              type="text"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="e.g. work, personal, important"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            />
+            {tags && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {tags.split(',').map((tag, idx) => {
+                  const trimmedTag = tag.trim();
+                  return trimmedTag ? (
+                    <span
+                      key={idx}
+                      className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full tracking-tight"
+                    >
+                      {trimmedTag}
+                    </span>
+                  ) : null;
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Editor */}
         <div className="bg-white rounded-lg shadow-sm p-8">
           <ReactQuill
             ref={quillRef}
@@ -188,7 +304,6 @@ const DocumentEditor: React.FC = () => {
         </div>
       </div>
 
-      <ShareDialog documentId={documentId || ''} />
       <NotificationPanel />
     </div>
   );

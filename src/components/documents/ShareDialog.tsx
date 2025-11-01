@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { generateClient } from 'aws-amplify/api';
+import { getCurrentUser, fetchAuthSession } from 'aws-amplify/auth';
 import { listShares } from '../../graphql/queries';
 import { createShare, updateShare, deleteShare } from '../../graphql/mutations';
 import { Share as ShareType } from '../../types';
@@ -22,7 +23,9 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ documentId, onClose }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadShares();
+    if (documentId) {
+      loadShares();
+    }
   }, [documentId]);
 
   /**
@@ -32,7 +35,13 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ documentId, onClose }) => {
     try {
       const response = await client.graphql({
         query: listShares as any,
-        variables: { documentId },
+        variables: {
+          filter: {
+            documentId: {
+              eq: documentId,
+            },
+          },
+        },
       }) as any;
 
       if ('data' in response && response.data?.listShares?.items) {
@@ -51,23 +60,42 @@ const ShareDialog: React.FC<ShareDialogProps> = ({ documentId, onClose }) => {
 
     try {
       setLoading(true);
-      await client.graphql({
+      
+      // Get current user info for sharedBy field
+      const user = await getCurrentUser();
+      const session = await fetchAuthSession();
+      const userEmail = session.tokens?.idToken?.payload?.email as string || '';
+      const username = user.username || userEmail || '';
+      
+      if (!username) {
+        throw new Error('Unable to get current user. Please sign out and sign in again.');
+      }
+
+      // Create share with all required fields
+      const response = await client.graphql({
         query: createShare as any,
         variables: {
           input: {
             documentId,
-            sharedWith: email,
-            sharedWithEmail: email,
+            sharedWith: email.trim(),
+            sharedWithEmail: email.trim(),
             permission,
+            sharedBy: username, // Required field
+            sharedAt: new Date().toISOString(), // Required field - AWSDateTime format
           },
         },
       }) as any;
 
-      setEmail('');
-      loadShares();
-    } catch (error) {
+      if ('data' in response && response.data?.createShare) {
+        setEmail('');
+        loadShares();
+      } else {
+        throw new Error('Failed to create share');
+      }
+    } catch (error: any) {
       console.error('Failed to share document:', error);
-      alert('Failed to share document. Please check the email and try again.');
+      const errorMessage = error?.message || 'Failed to share document. Please check the email and try again.';
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }

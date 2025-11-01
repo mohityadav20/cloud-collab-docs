@@ -6,6 +6,8 @@ interface DocumentToolbarProps {
   title: string;
   onTitleChange: (title: string) => void;
   onBack: () => void;
+  onSave: () => void;
+  onDelete: () => void;
   isSaving: boolean;
   documentId: string;
 }
@@ -19,6 +21,8 @@ const DocumentToolbar: React.FC<DocumentToolbarProps> = ({
   onTitleChange,
   isSaving,
   onBack,
+  onSave,
+  onDelete,
   documentId,
 }) => {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -91,6 +95,20 @@ const DocumentToolbar: React.FC<DocumentToolbarProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
+            <button
+              onClick={onSave}
+              disabled={isSaving}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed tracking-tight"
+            >
+              {isSaving ? 'Saving...' : 'Save'}
+            </button>
+            <button
+              onClick={onDelete}
+              disabled={isSaving}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed tracking-tight"
+            >
+              Delete
+            </button>
             <ExportButton documentId={documentId} />
             <ShareButton documentId={documentId} />
           </div>

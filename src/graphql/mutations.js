@@ -10,6 +10,9 @@ export const createDocument = /* GraphQL */ `
       id
       title
       content
+      description
+      tags
+      isFavorite
       createdAt
       updatedAt
       owner
@@ -30,6 +33,9 @@ export const updateDocument = /* GraphQL */ `
       id
       title
       content
+      description
+      tags
+      isFavorite
       createdAt
       updatedAt
       owner
@@ -50,6 +56,9 @@ export const deleteDocument = /* GraphQL */ `
       id
       title
       content
+      description
+      tags
+      isFavorite
       createdAt
       updatedAt
       owner
@@ -142,6 +151,7 @@ export const createUserProfile = /* GraphQL */ `
       _deleted
       _lastChangedAt
       updatedAt
+      owner
       __typename
     }
   }
@@ -161,6 +171,7 @@ export const updateUserProfile = /* GraphQL */ `
       _deleted
       _lastChangedAt
       updatedAt
+      owner
       __typename
     }
   }
@@ -180,6 +191,7 @@ export const deleteUserProfile = /* GraphQL */ `
       _deleted
       _lastChangedAt
       updatedAt
+      owner
       __typename
     }
   }
@@ -240,6 +252,72 @@ export const deleteDocumentPresence = /* GraphQL */ `
       _lastChangedAt
       createdAt
       updatedAt
+      __typename
+    }
+  }
+`;
+export const createTemplate = /* GraphQL */ `
+  mutation CreateTemplate(
+    $input: CreateTemplateInput!
+    $condition: ModelTemplateConditionInput
+  ) {
+    createTemplate(input: $input, condition: $condition) {
+      id
+      name
+      description
+      content
+      category
+      isPublic
+      owner
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+  }
+`;
+export const updateTemplate = /* GraphQL */ `
+  mutation UpdateTemplate(
+    $input: UpdateTemplateInput!
+    $condition: ModelTemplateConditionInput
+  ) {
+    updateTemplate(input: $input, condition: $condition) {
+      id
+      name
+      description
+      content
+      category
+      isPublic
+      owner
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+  }
+`;
+export const deleteTemplate = /* GraphQL */ `
+  mutation DeleteTemplate(
+    $input: DeleteTemplateInput!
+    $condition: ModelTemplateConditionInput
+  ) {
+    deleteTemplate(input: $input, condition: $condition) {
+      id
+      name
+      description
+      content
+      category
+      isPublic
+      owner
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
       __typename
     }
   }

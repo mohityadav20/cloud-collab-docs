@@ -13,6 +13,7 @@ export const getUserProfileByEmail = /* GraphQL */ `
       _deleted
       _lastChangedAt
       updatedAt
+      owner
       __typename
     }
   }
@@ -23,6 +24,9 @@ export const getDocument = /* GraphQL */ `
       id
       title
       content
+      description
+      tags
+      isFavorite
       createdAt
       updatedAt
       owner
@@ -45,6 +49,9 @@ export const listDocuments = /* GraphQL */ `
         id
         title
         content
+        description
+        tags
+        isFavorite
         createdAt
         updatedAt
         owner
@@ -77,6 +84,9 @@ export const syncDocuments = /* GraphQL */ `
         id
         title
         content
+        description
+        tags
+        isFavorite
         createdAt
         updatedAt
         owner
@@ -185,6 +195,7 @@ export const getUserProfile = /* GraphQL */ `
       _deleted
       _lastChangedAt
       updatedAt
+      owner
       __typename
     }
   }
@@ -206,6 +217,7 @@ export const listUserProfiles = /* GraphQL */ `
         _deleted
         _lastChangedAt
         updatedAt
+        owner
         __typename
       }
       nextToken
@@ -237,6 +249,7 @@ export const syncUserProfiles = /* GraphQL */ `
         _deleted
         _lastChangedAt
         updatedAt
+        owner
         __typename
       }
       nextToken
@@ -316,6 +329,87 @@ export const syncDocumentPresences = /* GraphQL */ `
         _lastChangedAt
         createdAt
         updatedAt
+        __typename
+      }
+      nextToken
+      startedAt
+      __typename
+    }
+  }
+`;
+export const getTemplate = /* GraphQL */ `
+  query GetTemplate($id: ID!) {
+    getTemplate(id: $id) {
+      id
+      name
+      description
+      content
+      category
+      isPublic
+      owner
+      createdAt
+      updatedAt
+      _version
+      _deleted
+      _lastChangedAt
+      __typename
+    }
+  }
+`;
+export const listTemplates = /* GraphQL */ `
+  query ListTemplates(
+    $filter: ModelTemplateFilterInput
+    $limit: Int
+    $nextToken: String
+  ) {
+    listTemplates(filter: $filter, limit: $limit, nextToken: $nextToken) {
+      items {
+        id
+        name
+        description
+        content
+        category
+        isPublic
+        owner
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
+        __typename
+      }
+      nextToken
+      startedAt
+      __typename
+    }
+  }
+`;
+export const syncTemplates = /* GraphQL */ `
+  query SyncTemplates(
+    $filter: ModelTemplateFilterInput
+    $limit: Int
+    $nextToken: String
+    $lastSync: AWSTimestamp
+  ) {
+    syncTemplates(
+      filter: $filter
+      limit: $limit
+      nextToken: $nextToken
+      lastSync: $lastSync
+    ) {
+      items {
+        id
+        name
+        description
+        content
+        category
+        isPublic
+        owner
+        createdAt
+        updatedAt
+        _version
+        _deleted
+        _lastChangedAt
         __typename
       }
       nextToken

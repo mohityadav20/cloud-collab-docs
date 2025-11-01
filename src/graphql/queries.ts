@@ -10,10 +10,14 @@ export const getDocument = gql`
       id
       title
       content
+      description
+      tags
+      isFavorite
       createdAt
       updatedAt
       owner
       ownerEmail
+      _version
     }
   }
 `;
@@ -25,10 +29,15 @@ export const listDocuments = gql`
         id
         title
         content
+        description
+        tags
+        isFavorite
         createdAt
         updatedAt
         owner
         ownerEmail
+        _version
+        _deleted
       }
       nextToken
     }
@@ -36,8 +45,8 @@ export const listDocuments = gql`
 `;
 
 export const listShares = gql`
-  query ListShares($documentId: ID!) {
-    listShares(filter: { documentId: { eq: $documentId } }) {
+  query ListShares($filter: ModelShareFilterInput) {
+    listShares(filter: $filter) {
       items {
         id
         documentId
@@ -59,6 +68,24 @@ export const getUserProfileByEmail = gql`
       username
       avatarUrl
       createdAt
+    }
+  }
+`;
+
+export const listTemplates = gql`
+  query ListTemplates($filter: ModelTemplateFilterInput) {
+    listTemplates(filter: $filter) {
+      items {
+        id
+        name
+        description
+        content
+        category
+        isPublic
+        owner
+        createdAt
+        updatedAt
+      }
     }
   }
 `;

@@ -10,10 +10,14 @@ export const createDocument = gql`
       id
       title
       content
+      description
+      tags
+      isFavorite
       createdAt
       updatedAt
       owner
       ownerEmail
+      _version
     }
   }
 `;
@@ -24,7 +28,14 @@ export const updateDocument = gql`
       id
       title
       content
+      description
+      tags
+      isFavorite
+      createdAt
       updatedAt
+      owner
+      ownerEmail
+      _version
     }
   }
 `;
@@ -63,6 +74,30 @@ export const updateShare = gql`
 export const deleteShare = gql`
   mutation DeleteShare($input: DeleteShareInput!) {
     deleteShare(input: $input) {
+      id
+    }
+  }
+`;
+
+export const createTemplate = gql`
+  mutation CreateTemplate($input: CreateTemplateInput!) {
+    createTemplate(input: $input) {
+      id
+      name
+      description
+      content
+      category
+      isPublic
+      owner
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const deleteTemplate = gql`
+  mutation DeleteTemplate($input: DeleteTemplateInput!) {
+    deleteTemplate(input: $input) {
       id
     }
   }

@@ -8,12 +8,14 @@ const client = generateClient();
 /**
  * Hook for subscribing to document updates
  * Provides real-time synchronization
+ * Based on reference implementation pattern
  */
 export const useDocumentSubscription = (documentId: string) => {
   const subscriptionRef = useRef<any>(null);
 
   /**
    * Subscribe to document updates
+   * Matches reference implementation pattern
    */
   const subscribeToUpdates = (callback: (document: Document) => void) => {
     if (!documentId) {
@@ -25,22 +27,24 @@ export const useDocumentSubscription = (documentId: string) => {
       subscriptionRef.current.unsubscribe();
     }
 
-    // Create new subscription
-    const subscription = client.graphql({
-      query: onUpdateDocument as any,
-      variables: { documentId },
-    }) as any;
-    
-    subscriptionRef.current = subscription.subscribe({
-      next: ({ data }: any) => {
-        if (data?.onUpdateDocument) {
-          callback(data.onUpdateDocument);
-        }
-      },
-      error: (error: Error) => {
-        console.error('Subscription error:', error);
-      },
-    });
+    // Create new subscription (matching reference pattern)
+    subscriptionRef.current = client
+      .graphql({
+        query: onUpdateDocument as any,
+        variables: { id: documentId },
+        authMode: 'userPool', // Explicitly set auth mode like reference
+      })
+      .subscribe({
+        next: ({ value }: any) => {
+          const updated = value?.data?.onUpdateDocument;
+          if (updated) {
+            callback(updated);
+          }
+        },
+        error: (err: Error) => {
+          console.warn('Subscription error:', err);
+        },
+      });
 
     // Return unsubscribe function
     return () => {

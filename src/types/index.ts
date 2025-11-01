@@ -6,10 +6,15 @@ export interface Document {
   id: string;
   title: string;
   content: string;
+  description?: string;
+  tags?: string[];
+  isFavorite?: boolean;
   createdAt: string;
   updatedAt: string;
   owner: string;
   ownerEmail: string;
+  _version?: number; // Version for conflict resolution
+  _deleted?: boolean; // Soft delete flag
 }
 
 export interface Share {
@@ -36,5 +41,17 @@ export interface DocumentPresence {
   userId: string;
   username?: string;
   lastSeen: string;
+}
+
+export interface Template {
+  id: string;
+  name: string;
+  description?: string;
+  content: string;
+  category?: string;
+  isPublic?: boolean;
+  owner: string;
+  createdAt: string;
+  updatedAt: string;
 }
 

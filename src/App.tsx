@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import { Hub } from 'aws-amplify/utils';
 import { configure } from './amplify/configure';
 import AuthPage from './components/auth/AuthPage';
 import DocumentList from './components/documents/DocumentList';
@@ -22,8 +23,38 @@ function App() {
     configure();
     setIsConfigured(true);
     
-    // Check authentication status
+    // Check authentication status on mount
     checkAuth();
+
+    // Listen for auth state changes (login, logout, etc.)
+    const unsubscribe = Hub.listen('auth', (data) => {
+      const { payload } = data;
+      
+      switch (payload.event) {
+        case 'signedIn':
+        case 'tokenRefresh':
+          console.log('User signed in or token refreshed');
+          checkAuth();
+          break;
+        case 'signedOut':
+          console.log('User signed out');
+          setIsAuthenticated(false);
+          break;
+        default:
+          break;
+      }
+    });
+
+    // Also check auth periodically (as a fallback)
+    const authCheckInterval = setInterval(() => {
+      checkAuth();
+    }, 2000); // Check every 2 seconds
+
+    // Cleanup
+    return () => {
+      unsubscribe();
+      clearInterval(authCheckInterval);
+    };
   }, []);
 
   /**
@@ -32,7 +63,8 @@ function App() {
   const checkAuth = async () => {
     try {
       const session = await fetchAuthSession();
-      setIsAuthenticated(session.tokens !== undefined);
+      const authenticated = session.tokens !== undefined;
+      setIsAuthenticated(authenticated);
     } catch (error) {
       console.error('Auth check failed:', error);
       setIsAuthenticated(false);

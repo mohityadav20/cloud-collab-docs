@@ -15,10 +15,15 @@ export enum Permission {
 
 
 
+
+
 type EagerDocument = {
   readonly id: string;
   readonly title: string;
   readonly content: string;
+  readonly description?: string | null;
+  readonly tags?: (string | null)[] | null;
+  readonly isFavorite?: boolean | null;
   readonly createdAt: string;
   readonly updatedAt: string;
   readonly owner: string;
@@ -29,6 +34,9 @@ type LazyDocument = {
   readonly id: string;
   readonly title: string;
   readonly content: string;
+  readonly description?: string | null;
+  readonly tags?: (string | null)[] | null;
+  readonly isFavorite?: boolean | null;
   readonly createdAt: string;
   readonly updatedAt: string;
   readonly owner: string;
@@ -109,4 +117,34 @@ export declare type DocumentPresence = LazyLoading extends LazyLoadingDisabled ?
 
 export declare const DocumentPresence: (new (init: ModelInit<DocumentPresence>) => DocumentPresence) & {
   copyOf(source: DocumentPresence, mutator: (draft: MutableModel<DocumentPresence>) => MutableModel<DocumentPresence> | void): DocumentPresence;
+}
+
+type EagerTemplate = {
+  readonly id: string;
+  readonly name: string;
+  readonly description?: string | null;
+  readonly content: string;
+  readonly category?: string | null;
+  readonly isPublic?: boolean | null;
+  readonly owner: string;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+type LazyTemplate = {
+  readonly id: string;
+  readonly name: string;
+  readonly description?: string | null;
+  readonly content: string;
+  readonly category?: string | null;
+  readonly isPublic?: boolean | null;
+  readonly owner: string;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+export declare type Template = LazyLoading extends LazyLoadingDisabled ? EagerTemplate : LazyTemplate
+
+export declare const Template: (new (init: ModelInit<Template>) => Template) & {
+  copyOf(source: Template, mutator: (draft: MutableModel<Template>) => MutableModel<Template> | void): Template;
 }
