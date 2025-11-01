@@ -89,7 +89,6 @@ const CreateDocumentButton: React.FC<CreateDocumentButtonProps> = ({ onCreate })
 
       if ('data' in response && response.data?.createDocument?.id) {
         const documentId = response.data.createDocument.id;
-        const createdDocument = response.data.createDocument;
         console.log('Document created successfully:', documentId);
         
         // Reset loading state before navigation to prevent flickering

@@ -27,7 +27,6 @@ const DocumentList: React.FC = () => {
   const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
   const [loading, setLoading] = useState(true);
   const [userEmail, setUserEmail] = useState<string>('');
-  const [currentUsername, setCurrentUsername] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewFilter, setViewFilter] = useState<ViewFilter>('all');
   const navigate = useNavigate();
@@ -80,7 +79,6 @@ const DocumentList: React.FC = () => {
       
       // Get current user's username (Cognito sub/username)
       const user = await getCurrentUser();
-      setCurrentUsername(user.username);
       console.log('Current user:', user.username);
     } catch (error) {
       console.error('Failed to load user info:', error);

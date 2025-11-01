@@ -1,69 +1,18 @@
-import { useEffect, useRef } from 'react';
-import { generateClient } from 'aws-amplify/api';
-import { onUpdateDocument } from '../graphql/subscriptions';
 import { Document } from '../types';
-
-const client = generateClient();
 
 /**
  * Hook for subscribing to document updates
- * Provides real-time synchronization
- * Based on reference implementation pattern
+ * DEPRECATED: No longer using real-time subscriptions (removed for manual save)
+ * Kept for backwards compatibility
  */
-export const useDocumentSubscription = (documentId: string) => {
-  const subscriptionRef = useRef<any>(null);
-
+export const useDocumentSubscription = (_documentId: string) => {
   /**
-   * Subscribe to document updates
-   * Matches reference implementation pattern
+   * Subscribe to document updates - No-op version
    */
-  const subscribeToUpdates = (callback: (document: Document) => void) => {
-    if (!documentId) {
-      return () => {};
-    }
-
-    // Cleanup existing subscription
-    if (subscriptionRef.current) {
-      subscriptionRef.current.unsubscribe();
-    }
-
-    // Create new subscription (matching reference pattern)
-    subscriptionRef.current = client
-      .graphql({
-        query: onUpdateDocument as any,
-        variables: { id: documentId },
-        authMode: 'userPool', // Explicitly set auth mode like reference
-      })
-      .subscribe({
-        next: ({ value }: any) => {
-          const updated = value?.data?.onUpdateDocument;
-          if (updated) {
-            callback(updated);
-          }
-        },
-        error: (err: Error) => {
-          console.warn('Subscription error:', err);
-        },
-      });
-
-    // Return unsubscribe function
-    return () => {
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-        subscriptionRef.current = null;
-      }
-    };
+  const subscribeToUpdates = (_callback: (document: Document) => void) => {
+    // No-op: subscriptions disabled
+    return () => {};
   };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (subscriptionRef.current) {
-        subscriptionRef.current.unsubscribe();
-      }
-    };
-  }, []);
 
   return { subscribeToUpdates };
 };
-

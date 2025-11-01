@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { generateClient } from 'aws-amplify/api';
 import { getCurrentUser } from 'aws-amplify/auth';
 import { listTemplates } from '../../graphql/queries';
-import { createTemplate, deleteTemplate } from '../../graphql/mutations';
+import { createTemplate } from '../../graphql/mutations';
 import { Template } from '../../types';
 
 const client = generateClient();
@@ -88,11 +88,6 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({ onSelect, onClose }
       console.error('Failed to create template:', error);
       alert('Failed to create template. Please try again.');
     }
-  };
-
-  const handleSelectBlank = () => {
-    onSelect(null);
-    onClose();
   };
 
   const handleSelectTemplate = (template: Template) => {
