@@ -123,9 +123,14 @@ const CreateDocumentButton: React.FC<CreateDocumentButtonProps> = ({ onCreate })
       <button
         onClick={() => setShowTemplateSelector(true)}
         disabled={loading}
-        className="px-6 py-3 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="relative px-8 py-4 gradient-primary text-white font-bold rounded-2xl hover:shadow-glow-lg disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 transition-all duration-300 overflow-hidden group"
       >
-        {loading ? 'Creating...' : '+ New Document'}
+        <span className="relative z-10 flex items-center gap-2">
+          <span className="text-xl">{loading ? '⏳' : '+'}</span>
+          <span>{loading ? 'Creating...' : 'New Document'}</span>
+        </span>
+        {/* Animated gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 gradient-animate"></div>
       </button>
 
       {showTemplateSelector && (

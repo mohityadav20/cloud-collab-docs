@@ -259,18 +259,30 @@ const DocumentList: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50">
+      {/* Modern Gradient Header */}
+      <nav className="bg-white/80 backdrop-blur-md shadow-lg border-b border-gray-200/50 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <h1 className="text-xl font-semibold text-gray-900">
-              My Documents
-            </h1>
+          <div className="flex justify-between h-20 items-center">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center animate-fadeIn">
+                <span className="text-2xl">📝</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gradient">
+                  My Documents
+                </h1>
+                <p className="text-xs text-gray-500">Manage and organize your work</p>
+              </div>
+            </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">{userEmail}</span>
+              <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full">
+                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                <span className="text-sm text-gray-700 font-medium">{userEmail}</span>
+              </div>
               <button
                 onClick={handleSignOut}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-5 py-2.5 text-sm font-medium text-white gradient-primary rounded-xl hover:shadow-glow transform hover:scale-105 transition-all duration-300"
               >
                 Sign Out
               </button>
@@ -279,52 +291,55 @@ const DocumentList: React.FC = () => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Filter tabs */}
-        <div className="flex items-center gap-2 mb-6 border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fadeIn">
+        {/* Filter tabs with modern design */}
+        <div className="flex items-center gap-2 mb-8 bg-white rounded-2xl p-2 shadow-md">
           <button
             onClick={() => setViewFilter('all')}
-            className={`px-4 py-2 font-medium transition-colors ${
+            className={`flex-1 px-6 py-3 font-semibold rounded-xl transition-all duration-300 ${
               viewFilter === 'all'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'gradient-primary text-white shadow-glow'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             }`}
           >
-            All Documents
+            📚 All Documents
           </button>
           <button
             onClick={() => setViewFilter('favorites')}
-            className={`px-4 py-2 font-medium transition-colors ${
+            className={`flex-1 px-6 py-3 font-semibold rounded-xl transition-all duration-300 ${
               viewFilter === 'favorites'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'gradient-primary text-white shadow-glow'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             }`}
           >
             ⭐ Favorites
           </button>
           <button
             onClick={() => setViewFilter('trash')}
-            className={`px-4 py-2 font-medium transition-colors ${
+            className={`flex-1 px-6 py-3 font-semibold rounded-xl transition-all duration-300 ${
               viewFilter === 'trash'
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'gradient-primary text-white shadow-glow'
+                : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
             }`}
           >
             🗑️ Trash
           </button>
         </div>
 
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-8">
           <CreateDocumentButton onCreate={handleCreateDocument} />
           
-          {/* Search bar */}
-          <div className="flex-1">
+          {/* Search bar with icon */}
+          <div className="flex-1 relative group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <span className="text-gray-400 group-focus-within:text-purple-500 transition-colors">🔍</span>
+            </div>
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by title, tags, or description..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-12 pr-4 py-4 bg-white border-2 border-gray-200 rounded-2xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-300 shadow-sm hover:shadow-md text-gray-900 placeholder-gray-400"
             />
           </div>
         </div>

@@ -37,16 +37,23 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-lg shadow-sm p-6 cursor-pointer hover:shadow-md transition-shadow relative"
+      className="document-card bg-white rounded-2xl shadow-lg hover:shadow-2xl p-6 cursor-pointer relative overflow-hidden group animate-fadeIn border border-gray-100"
     >
+      {/* Gradient Accent Bar */}
+      <div className="absolute top-0 left-0 right-0 h-1 gradient-primary opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+      
       {/* Favorite star button */}
       {onToggleFavorite && (
         <button
           onClick={handleStarClick}
-          className="absolute top-4 right-4 text-2xl hover:scale-110 transition-transform"
+          className="absolute top-4 right-4 text-2xl hover:scale-125 transform transition-all duration-300 z-10"
           title={document.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
         >
-          {document.isFavorite ? '⭐' : '☆'}
+          {document.isFavorite ? (
+            <span className="animate-scalePop">⭐</span>
+          ) : (
+            <span className="opacity-60 hover:opacity-100">☆</span>
+          )}
         </button>
       )}
 
@@ -54,43 +61,59 @@ const DocumentCard: React.FC<DocumentCardProps> = ({
       {showRestoreButton && onRestore && (
         <button
           onClick={handleRestoreClick}
-          className="absolute top-4 right-4 px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 tracking-tight"
+          className="absolute top-4 right-4 px-4 py-2 text-sm font-medium gradient-primary text-white rounded-lg hover:shadow-glow transform hover:scale-105 transition-all duration-300 tracking-tight"
         >
-          Restore
+          ↻ Restore
         </button>
       )}
       
-      <h3 className="text-lg font-semibold text-gray-900 mb-2 pr-8">
+      {/* Document Icon with Gradient */}
+      <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+        <span className="text-2xl">📄</span>
+      </div>
+      
+      <h3 className="text-xl font-bold text-gray-900 mb-2 pr-8 group-hover:text-gradient transition-all duration-300">
         {document.title || 'Untitled Document'}
       </h3>
       
       {document.description && (
-        <p className="text-sm text-gray-600 mb-2">
+        <p className="text-sm text-gray-600 mb-3 line-clamp-2">
           {document.description}
         </p>
       )}
       
       {document.tags && document.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1 mb-3">
+        <div className="flex flex-wrap gap-2 mb-4">
           {document.tags.map((tag, idx) => (
             <span
               key={idx}
-              className="px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded-full tracking-tight"
+              className="px-3 py-1 text-xs font-semibold text-purple-700 bg-purple-50 rounded-full tracking-tight border border-purple-200 hover:bg-purple-100 transition-colors duration-200"
             >
-              {tag}
+              #{tag}
             </span>
           ))}
         </div>
       )}
       
-      <p className="text-sm text-gray-500 mb-4 line-clamp-2">
+      <p className="text-sm text-gray-500 mb-4 line-clamp-2 leading-relaxed">
         {document.content?.replace(/<[^>]*>/g, '').substring(0, 100)}...
       </p>
       
-      <div className="flex justify-between items-center text-xs text-gray-400">
-        <span>Updated {new Date(document.updatedAt).toLocaleDateString()}</span>
-        <span className="tracking-tight">By {document.ownerEmail}</span>
+      {/* Bottom Info with Icons */}
+      <div className="flex justify-between items-center text-xs text-gray-400 pt-4 border-t border-gray-100">
+        <div className="flex items-center gap-1">
+          <span>🕒</span>
+          <span>{new Date(document.updatedAt).toLocaleDateString()}</span>
+        </div>
+        <div className="flex items-center gap-1 tracking-tight">
+          <span>👤</span>
+          <span className="truncate max-w-[120px]">{document.ownerEmail}</span>
+        </div>
       </div>
+      
+      {/* Hover Glow Effect */}
+      <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" 
+           style={{ boxShadow: '0 0 40px rgba(102, 126, 234, 0.1) inset' }}></div>
     </div>
   );
 };
